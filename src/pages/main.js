@@ -1,12 +1,44 @@
 import React, { Component } from 'react';
+import { View, Text , FlatList} from 'react-native';
+import webservice from '../services/webservice'
 
-import {View, Text} from 'react-native';
+export default class Main extends Component {
 
-export default class Main extends Component{
-    render(){
-        return(
+    state = {
+        repos: [],
+    };
+
+    componentDidMount() {
+        this.loadMyRepos();
+    }
+
+    loadMyRepos = async () => {
+        const response = webservice.get('/users/Italord0/repos')
+            .then(response => {
+                //console.log(response.data);
+                const repos = response.data;
+                this.setState( {repos} );
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    renderItem = ( {item} ) =>(
+        <View>
+            <Text>{item.name}</Text>
+            <Text>{item.description}</Text>
+        </View>
+    );
+
+    render() {
+        return (
             <View>
-                <Text>Olá React :)</Text>
+                <FlatList 
+                data={this.state.repos}
+                keyExtractor={item => item.id}
+                renderItem={this.renderItem}
+                />
             </View>
         );
     }
